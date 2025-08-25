@@ -1,0 +1,31 @@
+id: atlas.basic
+version: 0.1.0
+description: Minimal guard policies for LLM/agent safety.
+rules:
+  - id: prompt_injection_basic
+    severity: high
+    purpose: Detect obvious instruction hijacks (role/override/ignore-system).
+    match:
+      any:
+        - regex: "(?i)ignore (all|previous) (instructions|rules)"
+        - regex: "(?i)you are no longer|disregard the system"
+        - regex: "(?i)pretend to be (root|developer|admin)"
+    action: block   # or "review"
+  - id: exfiltration_keywords
+    severity: high
+    purpose: Flag requests for secrets or env details.
+    match:
+      any:
+        - regex: "(?i)(api[_ -]?key|secret|password|token)"
+        - regex: "(?i)ls\\s+~|cat\\s+\\/.+\\b(id_rsa|\\.env)"
+    action: review
+  - id: tool_constraints
+    severity: medium
+    purpose: Constrain OS/tool actions to allowlist.
+    tool_policy:
+      allowed_commands:
+        - "ls"
+        - "cat /readme.txt"
+      denied_patterns:
+        - "(?i)rm\\s+-rf"
+        - "(?i)curl\\s+http"
