@@ -1,0 +1,6 @@
+id: case.basic.prompt_injection.obvious
+fixture: fixtures/prompt_injection/obvious.md
+expected:
+  rule: prompt_injection_basic
+  action: block
+  severity: high
